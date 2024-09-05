@@ -19,13 +19,13 @@ const corsOptions = {
 // Middlewares.
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Routes.
 app.use("/note", NoteRouter);
 
 // Default error handler.
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: err.message});
     console.error(err);
 });
