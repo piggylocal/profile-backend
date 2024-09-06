@@ -1,10 +1,12 @@
-type Note = {
+type NoteInfo = {
     id: number;
     author: string;
     title: string;
-    path: string;
     categories: string[];
     keywords: string[];
 }
+type Note = NoteInfo & {
+    content: string;
+}
 
-export type {Note};
+export type {Note, NoteInfo};

@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-import { MongoClient, Collection, Document } from 'mongodb';
+import {MongoClient, Collection, Document} from 'mongodb';
 
-import { Note } from '../dto/note';
+import {Note, NoteInfo} from '../dto/note';
 
 dotenv.config();
 
@@ -34,7 +34,7 @@ class Manager {
             console.error("MongoDB is not connected");
             return null;
         }
-        const findQuery = { id: noteId };
+        const findQuery = {id: noteId};
         try {
             const result = await Manager.collection.findOne(findQuery);
             if (result === null) {
@@ -48,14 +48,20 @@ class Manager {
         }
     }
 
-    static async getAllNotes(): Promise<Note[]> {
+    static async getAllNoteInfos(): Promise<NoteInfo[]> {
         if (!Manager.collection) {
             console.error("MongoDB is not connected");
             return [];
         }
         try {
-            const result = await Manager.collection.find().toArray();
-            return result as unknown as Note[];
+            const result = await Manager.collection.find().project({
+                id: 1,
+                author: 1,
+                title: 1,
+                categories: 1,
+                keywords: 1
+            }).sort({id: -1}).toArray();
+            return result as unknown as NoteInfo[];
         } catch (err) {
             console.error(err);
             return [];
@@ -65,7 +71,9 @@ class Manager {
     private static initStarted = false;
     private static client = new MongoClient(process.env.MONGO_URI as string);
     private static collection: Collection<Document> | null = null;
-    private constructor() {}
+
+    private constructor() {
+    }
 }
 
 export default Manager;

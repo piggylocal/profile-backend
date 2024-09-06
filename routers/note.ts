@@ -22,7 +22,7 @@ router.get("/:_id", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
     try {
-        const notes = await MongoManager.getAllNotes();
+        const notes = await MongoManager.getAllNoteInfos();
         res.status(StatusCodes.OK).json(notes);
     } catch (err) {
         next(err);
