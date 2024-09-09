@@ -2,8 +2,12 @@ import dotenv from 'dotenv';
 import {MongoClient, Collection, Document} from 'mongodb';
 
 import {Note, NoteInfo} from '../dto/note';
+import {VisitorLog} from '../dto/user';
 
 dotenv.config();
+
+const collectionNotes = process.env.MONGO_COLLECTION_NOTES as string;
+const collectionVisitorLogs = process.env.MONGO_COLLECTION_VISITOR_LOGS as string;
 
 class Manager {
     static async init(): Promise<null> {
@@ -11,9 +15,12 @@ class Manager {
             return null;
         }
         Manager.initStarted = true;
+        Manager.collections = {};
         await Manager.client.connect();
-        const db = Manager.client.db(process.env.MONGO_DB_NAME);
-        Manager.collection = db.collection(process.env.MONGO_COLLECTION_NAME as string);
+        const dbNotes = Manager.client.db(process.env.MONGO_DB_NOTES);
+        const dbUsers = Manager.client.db(process.env.MONGO_DB_USERS);
+        Manager.collections[collectionNotes] = dbNotes.collection(collectionNotes);
+        Manager.collections[collectionVisitorLogs] = dbUsers.collection(collectionVisitorLogs);
         console.log("Connected to MongoDB");
         return null;
     }
@@ -22,7 +29,7 @@ class Manager {
         if (!Manager.initStarted) {
             return null;
         }
-        Manager.collection = null;
+        Manager.collections = {};
         await Manager.client.close();
         Manager.initStarted = false;
         console.log("Disconnected from MongoDB");
@@ -30,13 +37,14 @@ class Manager {
     }
 
     static async getNoteById(noteId: number): Promise<Note | null> {
-        if (!Manager.collection) {
-            console.error("MongoDB is not connected");
+        const collection = Manager.collections[collectionNotes];
+        if (!collection) {
+            console.error("Collection notes is not connected");
             return null;
         }
         const findQuery = {id: noteId};
         try {
-            const result = await Manager.collection.findOne(findQuery);
+            const result = await collection.findOne(findQuery);
             if (result === null) {
                 console.error(`Note with id ${noteId} not found`);
                 return null;
@@ -49,12 +57,13 @@ class Manager {
     }
 
     static async getAllNoteInfos(): Promise<NoteInfo[]> {
-        if (!Manager.collection) {
-            console.error("MongoDB is not connected");
+        const collection = Manager.collections[collectionNotes];
+        if (!collection) {
+            console.error("Collection notes is not connected")
             return [];
         }
         try {
-            const result = await Manager.collection.find().project({
+            const result = await collection.find().project({
                 id: 1,
                 author: 1,
                 title: 1,
@@ -68,9 +77,24 @@ class Manager {
         }
     }
 
+    static async postVisitorLog(visitorLog: VisitorLog): Promise<boolean> {
+        const collection = Manager.collections[collectionVisitorLogs];
+        if (!collection) {
+            console.error("Collection visitorLogs is not connected");
+            return false;
+        }
+        try {
+            await collection.insertOne(visitorLog);
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
     private static initStarted = false;
     private static client = new MongoClient(process.env.MONGO_URI as string);
-    private static collection: Collection<Document> | null = null;
+    private static collections: { [key: string]: Collection<Document> | null } = {};
 
     private constructor() {
     }

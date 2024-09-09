@@ -6,6 +6,7 @@ import StatusCodes from "http-status-codes";
 
 import MongoManager from './managers/mongo';
 import NoteRouter from './routers/note';
+import UserRouter from './routers/user';
 
 void MongoManager.init()
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(cors(corsOptions));
 
 // Routes.
 app.use("/note", NoteRouter);
+app.use("/user", UserRouter);
 
 // Default error handler.
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
