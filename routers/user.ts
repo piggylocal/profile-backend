@@ -11,7 +11,7 @@ router.post("/visitor-log", async (req, res, next) => {
         const log: VisitorLog = {
             ip: req.body.ip || "",
             pathname: req.body.pathname || "",
-            time: req.body.time || new Date()
+            time: new Date(req.body.time) || new Date()
         }
         const ok = await MongoManager.postVisitorLog(log);
         if (ok) {
