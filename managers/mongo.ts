@@ -1,13 +1,14 @@
 import dotenv from 'dotenv';
-import {MongoClient, Collection, Document} from 'mongodb';
+import {MongoClient, Collection} from 'mongodb';
 
 import {Note, NoteInfo} from '../dto/note';
-import {VisitorLog} from '../dto/user';
+import {User, VisitorLog} from '../dto/user';
 
 dotenv.config();
 
 const collectionNotes = process.env.MONGO_COLLECTION_NOTES as string;
 const collectionVisitorLogs = process.env.MONGO_COLLECTION_VISITOR_LOGS as string;
+const collectionUsers = process.env.MONGO_COLLECTION_USERS as string;
 
 class Manager {
     static async init(): Promise<null> {
@@ -21,6 +22,7 @@ class Manager {
         const dbUsers = Manager.client.db(process.env.MONGO_DB_USERS);
         Manager.collections[collectionNotes] = dbNotes.collection(collectionNotes);
         Manager.collections[collectionVisitorLogs] = dbUsers.collection(collectionVisitorLogs);
+        Manager.collections[collectionUsers] = dbUsers.collection(collectionUsers);
         console.log("Connected to MongoDB");
         return null;
     }
@@ -46,7 +48,7 @@ class Manager {
         try {
             const result = await collection.findOne(findQuery);
             if (result === null) {
-                console.error(`Note with id ${noteId} not found`);
+                console.log(`Note with id ${noteId} not found`);
                 return null;
             }
             return result as unknown as Note;
@@ -92,10 +94,46 @@ class Manager {
         }
     }
 
+    static async getUserByName(username: string): Promise<User | null> {
+        const collection = Manager.collections[collectionUsers];
+        if (!collection) {
+            console.error("Collection users is not connected");
+            return null;
+        }
+        const findQuery = {username};
+        try {
+            const result = await collection.findOne(findQuery);
+            if (result === null) {
+                console.log(`User with username ${username} not found`);
+                return null;
+            }
+            return result as unknown as User;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+
+    static async postUser(user: User): Promise<boolean> {
+        const collection = Manager.collections[collectionUsers];
+        if (!collection) {
+            console.error("Collection users is not connected");
+            return false;
+        }
+        try {
+            await collection.insertOne(user);
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
     private static initStarted = false;
     private static client = new MongoClient(process.env.MONGO_URI as string);
-    private static collections: { [key: string]: Collection<Document> | null } = {};
+    private static collections: { [key: string]: Collection | null } = {};
 
+    // This class should not be instantiated. We only need the static methods.
     private constructor() {
     }
 }
