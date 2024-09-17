@@ -129,6 +129,20 @@ class Manager {
         }
     }
 
+    static async getPV(): Promise<number> {
+        const collection = Manager.collections[collectionVisitorLogs];
+        if (!collection) {
+            console.error("Collection visitorLogs is not connected");
+            return 0;
+        }
+        try {
+            return await collection.estimatedDocumentCount();
+        } catch (err) {
+            console.error(err);
+            return 0;
+        }
+    }
+
     private static initStarted = false;
     private static client = new MongoClient(process.env.MONGO_URI as string);
     private static collections: { [key: string]: Collection | null } = {};

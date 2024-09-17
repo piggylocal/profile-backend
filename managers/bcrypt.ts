@@ -5,4 +5,8 @@ const hashPasswordSync = (password: string): string => {
     return bcrypt.hashSync(password, SALT_ROUNDS);
 }
 
-export {hashPasswordSync};
+const comparePasswordSync = (password: string, ciphertext: string): boolean => {
+    return bcrypt.compareSync(password, ciphertext);
+}
+
+export {hashPasswordSync, comparePasswordSync};

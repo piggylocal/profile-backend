@@ -5,6 +5,7 @@ import {NextFunction, Request, Response} from "express";
 import StatusCodes from "http-status-codes";
 
 import MongoManager from './managers/mongo';
+import {useJwtStrategy} from "./managers/passport";
 import NoteRouter from './routers/note';
 import UserRouter from './routers/user';
 
@@ -21,6 +22,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors(corsOptions));
+useJwtStrategy();
 
 // Routes.
 app.use("/note", NoteRouter);
@@ -28,6 +30,9 @@ app.use("/user", UserRouter);
 
 // Default error handler.
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
+    if (err.message === "Unauthorized") {
+        return res.status(StatusCodes.UNAUTHORIZED).json({message: err.message});
+    }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: err.message});
     console.error(err);
 });
