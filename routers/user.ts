@@ -70,14 +70,9 @@ router.post("/login", async (req, res, next) => {
     }
     try {
         const user = await MongoManager.getUserByName(username);
-        if (user === null) {
-            return res.status(StatusCodes.NOT_FOUND).json({
-                message: `User with username ${username} not found`
-            });
-        }
-        if (!comparePasswordSync(password, user.ciphertext)) {
+        if (user === null || !comparePasswordSync(password, user.ciphertext)) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                message: "Invalid password"
+                message: "Username or password is incorrect"
             });
         }
         // Password is correct.
