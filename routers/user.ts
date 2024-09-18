@@ -64,7 +64,7 @@ router.post("/visitor-log", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
     const {username, password} = req.body;
     if (!username || !password) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
+        return res.status(StatusCodes.UNAUTHORIZED).json({
             message: "Username and password are required"
         });
     }
