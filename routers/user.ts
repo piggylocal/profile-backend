@@ -89,6 +89,9 @@ router.get(
     async (req, res, next) => {
         try {
             const pv = await MongoManager.getPV();
+            if (pv < 0) {
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "Failed to get page views"});
+            }
             res.status(StatusCodes.OK).json({pv});
         } catch (err) {
             next(err);

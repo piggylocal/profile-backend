@@ -165,13 +165,13 @@ class Manager {
         const collection = Manager.collections[collectionVisitorLogs];
         if (!collection) {
             console.error("Collection visitorLogs is not connected");
-            return 0;
+            return -1;
         }
         try {
             return await collection.estimatedDocumentCount();
         } catch (err) {
             console.error(err);
-            return 0;
+            return -1;
         }
     }
 
