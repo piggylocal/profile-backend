@@ -93,18 +93,21 @@ class Manager {
         }
     }
 
-    // Get the exact number of notes in the database.
-    static async getNoteCount(): Promise<number> {
+    static async getNoteMaxId(): Promise<number> {
         const collection = Manager.collections[collectionNotes];
         if (!collection) {
             console.error("Collection notes is not connected");
-            return 0;
+            return -1;
         }
         try {
-            return await collection.countDocuments();
+            const result = await collection.find().project({id: 1}).sort({id: -1}).limit(1).toArray();
+            if (result.length === 0) {
+                return 0;
+            }
+            return result[0].id;
         } catch (err) {
             console.error(err);
-            return 0;
+            return -1;
         }
     }
 

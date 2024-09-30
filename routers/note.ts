@@ -34,18 +34,12 @@ router.post(
     "/",
     passport.authenticate("jwt", {session: false, failWithError: true}),
     async (req, res, next) => {
-        let {id, author, title, categories, keywords, content} = req.body;
-        if (!id) {
-            return res.status(StatusCodes.BAD_REQUEST).json({message: "Note id is required"});
+        let {author, title, categories, keywords, content} = req.body;
+        const maxId = await MongoManager.getNoteMaxId();
+        if (maxId < 0) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "Failed to get max note id"});
         }
-        try {
-            const existingNote = await MongoManager.getNoteById(id as number);
-            if (existingNote !== null) {
-                return res.status(StatusCodes.CONFLICT).json({message: `Note with id ${id} already exists`});
-            }
-        } catch (err) {
-            return next(err);
-        }
+        const id = maxId + 1;
         if (!author) {
             return res.status(StatusCodes.BAD_REQUEST).json({message: "Author is required"});
         }
