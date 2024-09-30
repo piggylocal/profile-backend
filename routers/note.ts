@@ -1,7 +1,9 @@
 import express from "express";
 import StatusCodes from "http-status-codes";
+import passport from "passport";
 
 import MongoManager from '../managers/mongo';
+import {Note} from "../dto/note";
 
 const router = express.Router();
 
@@ -11,8 +13,7 @@ router.get("/:_id", async (req, res, next) => {
     try {
         const note = await MongoManager.getNoteById(noteId);
         if (note === null) {
-            res.status(StatusCodes.NOT_FOUND).json({message: `Note with id ${noteId} not found`});
-            return;
+            return res.status(StatusCodes.NOT_FOUND).json({message: `Note with id ${noteId} not found`});
         }
         res.status(StatusCodes.OK).json(note);
     } catch (err) {
@@ -28,5 +29,44 @@ router.get("/", async (req, res, next) => {
         next(err);
     }
 });
+
+router.post(
+    "/",
+    passport.authenticate("jwt", {session: false, failWithError: true}),
+    async (req, res, next) => {
+        let {id, author, title, categories, keywords, content} = req.body;
+        if (!id) {
+            return res.status(StatusCodes.BAD_REQUEST).json({message: "Note id is required"});
+        }
+        try {
+            const existingNote = await MongoManager.getNoteById(id as number);
+            if (existingNote !== null) {
+                return res.status(StatusCodes.CONFLICT).json({message: `Note with id ${id} already exists`});
+            }
+        } catch (err) {
+            return next(err);
+        }
+        if (!author) {
+            return res.status(StatusCodes.BAD_REQUEST).json({message: "Author is required"});
+        }
+        if (!title) {
+            return res.status(StatusCodes.BAD_REQUEST).json({message: "Title is required"});
+        }
+        categories ||= [];
+        keywords ||= [];
+        content ||= "";
+
+        const note: Note = {id, author, title, categories, keywords, content}
+        try {
+            const success = await MongoManager.postNote(note);
+            if (!success) {
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "Failed to post note"});
+            }
+            res.status(StatusCodes.CREATED).json({message: "Note posted"});
+        } catch (err) {
+            next(err);
+        }
+    }
+);
 
 export default router;

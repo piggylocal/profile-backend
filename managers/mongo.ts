@@ -48,13 +48,27 @@ class Manager {
         try {
             const result = await collection.findOne(findQuery);
             if (result === null) {
-                console.log(`Note with id ${noteId} not found`);
                 return null;
             }
             return result as unknown as Note;
         } catch (err) {
             console.error(err);
             return null;
+        }
+    }
+
+    static async postNote(note: Note): Promise<boolean> {
+        const collection = Manager.collections[collectionNotes];
+        if (!collection) {
+            console.error("Collection notes is not connected");
+            return false;
+        }
+        try {
+            await collection.insertOne(note);
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
         }
     }
 
@@ -76,6 +90,21 @@ class Manager {
         } catch (err) {
             console.error(err);
             return [];
+        }
+    }
+
+    // Get the exact number of notes in the database.
+    static async getNoteCount(): Promise<number> {
+        const collection = Manager.collections[collectionNotes];
+        if (!collection) {
+            console.error("Collection notes is not connected");
+            return 0;
+        }
+        try {
+            return await collection.countDocuments();
+        } catch (err) {
+            console.error(err);
+            return 0;
         }
     }
 

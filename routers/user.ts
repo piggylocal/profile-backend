@@ -93,6 +93,7 @@ router.get(
         } catch (err) {
             next(err);
         }
-    });
+    }
+);
 
 export default router;
