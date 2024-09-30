@@ -63,4 +63,23 @@ router.post(
     }
 );
 
+router.delete(
+    "/:_id",
+    passport.authenticate("jwt", {session: false, failWithError: true}),
+    async (req, res, next) => {
+        const {_id} = req.params;
+        const noteId = parseInt(_id);
+        try {
+            const success = await MongoManager.deleteNoteById(noteId);
+            if (!success) {
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "Failed to delete note"});
+            }
+            res.status(StatusCodes.OK).json({message: "Note deleted"});
+        } catch (err) {
+            next(err);
+        }
+    }
+);
+
+
 export default router;

@@ -72,6 +72,22 @@ class Manager {
         }
     }
 
+    static async deleteNoteById(noteId: number): Promise<boolean> {
+        const collection = Manager.collections[collectionNotes];
+        if (!collection) {
+            console.error("Collection notes is not connected");
+            return false;
+        }
+        const deleteQuery = {id: noteId};
+        try {
+            const result = await collection.deleteOne(deleteQuery);
+            return result.deletedCount === 1;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
     static async getAllNoteInfos(): Promise<NoteInfo[]> {
         const collection = Manager.collections[collectionNotes];
         if (!collection) {
