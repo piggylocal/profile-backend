@@ -8,7 +8,6 @@ import MongoManager from './managers/mongo';
 import {useJwtStrategy} from "./managers/passport";
 import NoteRouter from './routers/note';
 import UserRouter from './routers/user';
-import WatchRouter from './routers/ex/watch';
 
 void MongoManager.init()
 dotenv.config();
@@ -28,7 +27,6 @@ useJwtStrategy();
 // Routes.
 app.use("/note", NoteRouter);
 app.use("/user", UserRouter);
-app.use("/watch", WatchRouter);
 
 // Default error handler.
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
