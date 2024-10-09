@@ -72,9 +72,10 @@ router.post(
     "/syncLog",
     passport.authenticate("jwt", {session: false, failWithError: true}),
     async (req, res, next) => {
-        const {time, url, position}: SyncLog = req.body;
+        const {time, url, position} = req.body;
+        const syncLog = {time: new Date(time), url, position};
         try {
-            const success = await MongoManager.postSyncLog({time, url, position});
+            const success = await MongoManager.postSyncLog(syncLog);
             if (success) {
                 res.status(StatusCodes.CREATED).json({message: "Sync log posted"});
             } else {
