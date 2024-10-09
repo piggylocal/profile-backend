@@ -9,6 +9,8 @@ dotenv.config();
 const collectionNotes = process.env.MONGO_COLLECTION_NOTES as string;
 const collectionVisitorLogs = process.env.MONGO_COLLECTION_VISITOR_LOGS as string;
 const collectionUsers = process.env.MONGO_COLLECTION_USERS as string;
+const collectionM3U8Mappings = process.env.MONGO_COLLECTION_M3U8_MAPPINGS as string;
+const collectionSyncLogs = process.env.MONGO_COLLECTION_SYNC_LOGS as string;
 
 class Manager {
     static async init(): Promise<null> {
@@ -20,9 +22,12 @@ class Manager {
         await Manager.client.connect();
         const dbNotes = Manager.client.db(process.env.MONGO_DB_NOTES);
         const dbUsers = Manager.client.db(process.env.MONGO_DB_USERS);
+        const dbWatch = Manager.client.db(process.env.MONGO_DB_WATCH);
         Manager.collections[collectionNotes] = dbNotes.collection(collectionNotes);
         Manager.collections[collectionVisitorLogs] = dbUsers.collection(collectionVisitorLogs);
         Manager.collections[collectionUsers] = dbUsers.collection(collectionUsers);
+        Manager.collections[collectionM3U8Mappings] = dbWatch.collection(collectionM3U8Mappings);
+        Manager.collections[collectionSyncLogs] = dbWatch.collection(collectionSyncLogs);
         console.log("Connected to MongoDB");
         return null;
     }
@@ -188,6 +193,75 @@ class Manager {
         } catch (err) {
             console.error(err);
             return -1;
+        }
+    }
+
+    static async postM3U8Mapping(url: string, m3u8Url: string): Promise<boolean> {
+        const collection = Manager.collections[collectionM3U8Mappings];
+        if (!collection) {
+            console.error("Collection m3u8Mappings is not connected");
+            return false;
+        }
+        try {
+            await collection.insertOne({url, m3u8Url});
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    static async getM3U8(url: string): Promise<string | null> {
+        const collection = Manager.collections[collectionM3U8Mappings];
+        if (!collection) {
+            console.error("Collection m3u8Mappings is not connected");
+            return null;
+        }
+        const findQuery = {url};
+        try {
+            const result = await collection.findOne(findQuery);
+            if (result === null) {
+                console.log(`M3U8 mapping for ${url} not found`);
+                return null;
+            }
+            return result.m3u8Url;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+
+    static async getLatestSyncLog(): Promise<SyncLog | null> {
+        const collection = Manager.collections[collectionSyncLogs];
+        if (!collection) {
+            console.error("Collection syncLogs is not connected");
+            return null;
+        }
+        try {
+            const result = await collection.find().sort({time: -1}).limit(1).toArray();
+            if (result.length === 0) {
+                console.log("No sync logs found");
+                return null;
+            }
+            return result[0] as unknown as SyncLog;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+
+    static async postSyncLog(syncLog: SyncLog): Promise<boolean> {
+        const collection = Manager.collections[collectionSyncLogs];
+        if (!collection) {
+            console.error("Collection syncLogs is not connected");
+            return false;
+        }
+        try {
+            await collection.insertOne(syncLog);
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
         }
     }
 
