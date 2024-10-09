@@ -12,7 +12,7 @@ router.post(
         const url = req.body.url;
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0');
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0');
         const timeoutId = setTimeout(async () => {
             await browser.close();
             res.status(StatusCodes.BAD_REQUEST).json({message: "Timeout"});
