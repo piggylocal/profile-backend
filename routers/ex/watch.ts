@@ -2,19 +2,23 @@ import passport from "passport";
 import StatusCodes from "http-status-codes";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import AnonymizePlugin from "puppeteer-extra-plugin-anonymize-ua";
 
 import router from "../user";
 import MongoManager from "../../managers/mongo";
 
 puppeteer.use(StealthPlugin());
+puppeteer.use(AnonymizePlugin());
 
 // This does not work on Render.com.
-/*router.post(
+router.post(
     "/m3u8",
     passport.authenticate("jwt", {session: false, failWithError: true}),
     async (req, res) => {
         const url = req.body.url;
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless: "shell"
+        });
         const page = await browser.newPage();
         const timeoutId = setTimeout(async () => {
             await browser.close();
@@ -34,7 +38,7 @@ puppeteer.use(StealthPlugin());
             console.error(err);
         }
     }
-);*/
+);
 
 router.get(
     "/m3u8",
