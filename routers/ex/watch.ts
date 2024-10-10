@@ -23,7 +23,7 @@ router.post(
         const timeoutId = setTimeout(async () => {
             await browser.close();
             res.status(StatusCodes.BAD_REQUEST).json({message: "Timeout"});
-        }, 5000);
+        }, 10000);
         page.on('request', async request => {
             console.log(request.url());
             if (request.url().trim().endsWith(".m3u8")) {
