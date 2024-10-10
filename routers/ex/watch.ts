@@ -11,7 +11,7 @@ puppeteer.use(StealthPlugin());
 puppeteer.use(AnonymizePlugin());
 
 // This does not work on Render.com.
-router.post(
+/*router.post(
     "/m3u8",
     passport.authenticate("jwt", {session: false, failWithError: true}),
     async (req, res) => {
@@ -38,7 +38,7 @@ router.post(
             console.error(err);
         }
     }
-);
+);*/
 
 router.get(
     "/m3u8",
