@@ -9,6 +9,7 @@ import {useJwtStrategy} from "./managers/passport";
 import NoteRouter from './routers/note';
 import UserRouter from './routers/user';
 import WatchRouter from './routers/ex/watch';
+// import {addDungeonMeshi} from "./managers/ex/u3m8";
 // import {addLangYaBang2Mappings} from "./managers/ex/u3m8";
 
 void MongoManager.init()
@@ -46,6 +47,7 @@ app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 
     // setTimeout(addLangYaBang2Mappings, 3000);
+    // setTimeout(addDungeonMeshi, 3000);
 });
 
 process.on('SIGTERM', shutDown);

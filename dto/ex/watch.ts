@@ -3,3 +3,5 @@ type SyncLog = {
     url: string;
     position: number;
 }
+
+export type {SyncLog};

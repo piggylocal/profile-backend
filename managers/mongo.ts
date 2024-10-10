@@ -3,6 +3,7 @@ import {MongoClient, Collection} from 'mongodb';
 
 import {Note, NoteInfo} from '../dto/note';
 import {User, VisitorLog} from '../dto/user';
+import {SyncLog} from '../dto/ex/watch';
 
 dotenv.config();
 
