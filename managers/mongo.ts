@@ -94,14 +94,14 @@ class Manager {
         }
     }
 
-    static async getAllNoteInfos(): Promise<NoteInfo[]> {
+    static async getNoteInfos(category?: string): Promise<NoteInfo[]> {
         const collection = Manager.collections[collectionNotes];
         if (!collection) {
             console.error("Collection notes is not connected")
             return [];
         }
         try {
-            const result = await collection.find().project({
+            const result = await collection.find(category ? {categories: category} : {}).project({
                 id: 1,
                 author: 1,
                 title: 1,

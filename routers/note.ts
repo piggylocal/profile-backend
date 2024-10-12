@@ -21,9 +21,19 @@ router.get("/:_id", async (req, res, next) => {
     }
 });
 
-router.get("/", async (req, res, next) => {
+router.get("/", async (_, res, next) => {
     try {
-        const notes = await MongoManager.getAllNoteInfos();
+        const notes = await MongoManager.getNoteInfos();
+        res.status(StatusCodes.OK).json(notes);
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.get("/categories/:category", async (req, res, next) => {
+    const {category} = req.params;
+    try {
+        const notes = await MongoManager.getNoteInfos(category);
         res.status(StatusCodes.OK).json(notes);
     } catch (err) {
         next(err);
