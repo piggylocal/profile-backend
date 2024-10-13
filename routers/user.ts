@@ -6,8 +6,10 @@ import MongoManager from '../managers/mongo';
 import {hashPasswordSync, comparePasswordSync} from "../managers/bcrypt";
 import {VisitorLog} from "../dto/user";
 import {createToken} from "../managers/jwt";
+import {createJwtStrategy} from "../managers/passport";
 
 const router = express.Router();
+const jwtStrategy = createJwtStrategy((username) => username === process.env.USER_ADMIN);
 
 router.post("/visitor-log", async (req, res, next) => {
     try {
@@ -85,8 +87,8 @@ router.post("/login", async (req, res, next) => {
 
 router.get(
     "/pv",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
-    async (req, res, next) => {
+    passport.authenticate(jwtStrategy, {session: false, failWithError: true}),
+    async (_, res, next) => {
         try {
             const pv = await MongoManager.getPV();
             if (pv < 0) {

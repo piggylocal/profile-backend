@@ -6,6 +6,9 @@ import AnonymizePlugin from "puppeteer-extra-plugin-anonymize-ua";
 
 import router from "../user";
 import MongoManager from "../../managers/mongo";
+import {createJwtStrategy} from "../../managers/passport";
+
+const jwtStrategyWatch = createJwtStrategy((username) => username === process.env.USER_WATCH);
 
 puppeteer.use(StealthPlugin());
 puppeteer.use(AnonymizePlugin());
@@ -13,7 +16,7 @@ puppeteer.use(AnonymizePlugin());
 // This does not work on Render.com.
 /*router.post(
     "/m3u8",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
+    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
     async (req, res) => {
         const url = req.body.url;
         const browser = await puppeteer.launch({
@@ -42,7 +45,7 @@ puppeteer.use(AnonymizePlugin());
 
 router.get(
     "/m3u8",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
+    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
     async (req, res) => {
         const url = req.query.url as string;
         const m3u8 = await MongoManager.getM3U8(url);
@@ -56,7 +59,7 @@ router.get(
 
 router.get(
     "/syncLog",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
+    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
     async (req, res, next) => {
         try {
             const syncLog = await MongoManager.getLatestSyncLog();
@@ -74,7 +77,7 @@ router.get(
 
 router.post(
     "/syncLog",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
+    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
     async (req, res, next) => {
         const {time, url, position} = req.body;
         const syncLog = {time: new Date(time), url, position};

@@ -5,7 +5,6 @@ import {NextFunction, Request, Response} from "express";
 import StatusCodes from "http-status-codes";
 
 import MongoManager from './managers/mongo';
-import {useJwtStrategy} from "./managers/passport";
 import NoteRouter from './routers/note';
 import UserRouter from './routers/user';
 import WatchRouter from './routers/ex/watch';
@@ -25,7 +24,6 @@ const corsOptions = {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors(corsOptions));
-useJwtStrategy();
 
 // Routes.
 app.use("/note", NoteRouter);

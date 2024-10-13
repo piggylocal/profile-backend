@@ -4,8 +4,10 @@ import passport from "passport";
 
 import MongoManager from '../managers/mongo';
 import {Note} from "../dto/note";
+import {createJwtStrategy} from "../managers/passport";
 
 const router = express.Router();
+const jwtStrategy = createJwtStrategy((username) => username === process.env.USER_ADMIN);
 
 router.get("/:_id", async (req, res, next) => {
     const {_id} = req.params;
@@ -42,7 +44,7 @@ router.get("/categories/:category", async (req, res, next) => {
 
 router.post(
     "/",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
+    passport.authenticate(jwtStrategy, {session: false, failWithError: true}),
     async (req, res, next) => {
         let {author, title, categories, keywords, content} = req.body;
         const maxId = await MongoManager.getNoteMaxId();
@@ -75,7 +77,7 @@ router.post(
 
 router.delete(
     "/:_id",
-    passport.authenticate("jwt", {session: false, failWithError: true}),
+    passport.authenticate(jwtStrategy, {session: false, failWithError: true}),
     async (req, res, next) => {
         const {_id} = req.params;
         const noteId = parseInt(_id);
