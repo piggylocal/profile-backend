@@ -6,9 +6,7 @@ import AnonymizePlugin from "puppeteer-extra-plugin-anonymize-ua";
 
 import router from "../user";
 import MongoManager from "../../managers/mongo";
-import {createJwtStrategy} from "../../managers/passport";
-
-const jwtStrategyWatch = createJwtStrategy((username) => username === process.env.USER_WATCH);
+import {jwtWatch} from "../../managers/passport";
 
 puppeteer.use(StealthPlugin());
 puppeteer.use(AnonymizePlugin());
@@ -16,7 +14,7 @@ puppeteer.use(AnonymizePlugin());
 // This does not work on Render.com.
 /*router.post(
     "/m3u8",
-    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
+    passport.authenticate(jwtWatch, {session: false, failWithError: true}),
     async (req, res) => {
         const url = req.body.url;
         const browser = await puppeteer.launch({
@@ -45,7 +43,7 @@ puppeteer.use(AnonymizePlugin());
 
 router.get(
     "/m3u8",
-    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
+    passport.authenticate(jwtWatch, {session: false, failWithError: true}),
     async (req, res) => {
         const url = req.query.url as string;
         const m3u8 = await MongoManager.getM3U8(url);
@@ -59,7 +57,7 @@ router.get(
 
 router.get(
     "/m3u8/all",
-    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
+    passport.authenticate(jwtWatch, {session: false, failWithError: true}),
     async (_, res) => {
         const m3u8s = await MongoManager.getM3U8All();
         res.status(StatusCodes.OK).json(m3u8s);
@@ -68,7 +66,7 @@ router.get(
 
 router.get(
     "/syncLog",
-    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
+    passport.authenticate(jwtWatch, {session: false, failWithError: true}),
     async (_, res, next) => {
         try {
             const syncLog = await MongoManager.getLatestSyncLog();
@@ -86,7 +84,7 @@ router.get(
 
 router.post(
     "/syncLog",
-    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
+    passport.authenticate(jwtWatch, {session: false, failWithError: true}),
     async (req, res, next) => {
         const {time, url, position} = req.body;
         const syncLog = {time: new Date(time), url, position};

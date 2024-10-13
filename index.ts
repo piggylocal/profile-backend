@@ -8,6 +8,7 @@ import MongoManager from './managers/mongo';
 import NoteRouter from './routers/note';
 import UserRouter from './routers/user';
 import WatchRouter from './routers/ex/watch';
+import './managers/passport';
 // import {addDungeonMeshi} from "./managers/ex/u3m8";
 // import {addLangYaBang2Mappings} from "./managers/ex/u3m8";
 // import {addTangBoHu} from "./managers/ex/u3m8";
