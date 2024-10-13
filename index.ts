@@ -10,6 +10,7 @@ import UserRouter from './routers/user';
 import WatchRouter from './routers/ex/watch';
 // import {addDungeonMeshi} from "./managers/ex/u3m8";
 // import {addLangYaBang2Mappings} from "./managers/ex/u3m8";
+// import {addTangBoHu} from "./managers/ex/u3m8";
 
 void MongoManager.init()
 dotenv.config();
@@ -46,6 +47,7 @@ app.listen(port, () => {
 
     // setTimeout(addLangYaBang2Mappings, 3000);
     // setTimeout(addDungeonMeshi, 3000);
+    // setTimeout(addTangBoHu, 3000);
 });
 
 process.on('SIGTERM', shutDown);

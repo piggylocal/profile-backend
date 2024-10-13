@@ -197,14 +197,14 @@ class Manager {
         }
     }
 
-    static async postM3U8Mapping(url: string, m3u8Url: string): Promise<boolean> {
+    static async postM3U8Mapping(url: string, m3u8Url: string, title: string, episode: number): Promise<boolean> {
         const collection = Manager.collections[collectionM3U8Mappings];
         if (!collection) {
             console.error("Collection m3u8Mappings is not connected");
             return false;
         }
         try {
-            await collection.insertOne({url, m3u8Url});
+            await collection.insertOne({url, m3u8Url, title, episode});
             return true;
         } catch (err) {
             console.error(err);
