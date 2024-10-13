@@ -58,9 +58,18 @@ router.get(
 );
 
 router.get(
+    "/m3u8/all",
+    passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
+    async (_, res) => {
+        const m3u8s = await MongoManager.getM3U8All();
+        res.status(StatusCodes.OK).json(m3u8s);
+    }
+)
+
+router.get(
     "/syncLog",
     passport.authenticate(jwtStrategyWatch, {session: false, failWithError: true}),
-    async (req, res, next) => {
+    async (_, res, next) => {
         try {
             const syncLog = await MongoManager.getLatestSyncLog();
             if (syncLog === null) {

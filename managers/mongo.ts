@@ -3,7 +3,7 @@ import {MongoClient, Collection} from 'mongodb';
 
 import {Note, NoteInfo} from '../dto/note';
 import {User, VisitorLog} from '../dto/user';
-import {SyncLog} from '../dto/ex/watch';
+import {M3U8Mapping, SyncLog} from '../dto/ex/watch';
 
 dotenv.config();
 
@@ -229,6 +229,21 @@ class Manager {
         } catch (err) {
             console.error(err);
             return null;
+        }
+    }
+
+    static async getM3U8All(): Promise<M3U8Mapping[]> {
+        const collection = Manager.collections[collectionM3U8Mappings];
+        if (!collection) {
+            console.error("Collection m3u8Mappings is not connected");
+            return [];
+        }
+        try {
+            const result = await collection.find().toArray();
+            return result as unknown as M3U8Mapping[];
+        } catch (err) {
+            console.error(err);
+            return [];
         }
     }
 
