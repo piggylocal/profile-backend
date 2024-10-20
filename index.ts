@@ -7,6 +7,7 @@ import StatusCodes from "http-status-codes";
 import MongoManager from './managers/mongo';
 import NoteRouter from './routers/note';
 import UserRouter from './routers/user';
+import AuthRouter from './routers/auth';
 import WatchRouter from './routers/ex/watch';
 import './managers/passport';
 // import {addDungeonMeshi} from "./managers/ex/u3m8";
@@ -30,10 +31,11 @@ app.use(cors(corsOptions));
 // Routes.
 app.use("/note", NoteRouter);
 app.use("/user", UserRouter);
+app.use("/auth", AuthRouter);
 app.use("/watch", WatchRouter);
 
 // Default error handler.
-app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
+app.use((err: Error, _1: Request, res: Response, _2: NextFunction) => {
     if (err.message === "Unauthorized") {
         return res.status(StatusCodes.UNAUTHORIZED).json({message: err.message});
     }
