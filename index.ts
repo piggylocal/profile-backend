@@ -19,7 +19,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-    origin: ['https://acst.me', 'http://localhost:3000', /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}$/],
+    origin: ['https://acst.me', 'http://localhost:3000', /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:3000$/],
     optionsSuccessStatus: 200
 }
 
