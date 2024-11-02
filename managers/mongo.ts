@@ -4,6 +4,7 @@ import {MongoClient, Collection} from 'mongodb';
 import {Note, NoteInfo} from '../dto/note';
 import {User, VisitorLog} from '../dto/user';
 import {M3U8Mapping, SyncLog} from '../dto/ex/watch';
+import {ImgurCredentials} from "../dto/auth";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const collectionVisitorLogs = "visitorLogs";
 const collectionUsers = "users";
 const collectionM3U8Mappings = "m3u8Mappings";
 const collectionSyncLogs = "syncLogs";
+const collectionImgur = "imgur";
 
 class Manager {
     static async init(): Promise<null> {
@@ -24,11 +26,13 @@ class Manager {
         const dbNotes = Manager.client.db("notes");
         const dbUsers = Manager.client.db("users");
         const dbWatch = Manager.client.db("watch");
+        const dbAuth = Manager.client.db("auth");
         Manager.collections[collectionNotes] = dbNotes.collection(collectionNotes);
         Manager.collections[collectionVisitorLogs] = dbUsers.collection(collectionVisitorLogs);
         Manager.collections[collectionUsers] = dbUsers.collection(collectionUsers);
         Manager.collections[collectionM3U8Mappings] = dbWatch.collection(collectionM3U8Mappings);
         Manager.collections[collectionSyncLogs] = dbWatch.collection(collectionSyncLogs);
+        Manager.collections[collectionImgur] = dbAuth.collection(collectionImgur);
         console.log("Connected to MongoDB");
         return null;
     }
@@ -274,6 +278,21 @@ class Manager {
         }
         try {
             await collection.insertOne(syncLog);
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    static async updateImgurCredentials(credentials: ImgurCredentials): Promise<boolean> {
+        const collection = Manager.collections[collectionImgur];
+        if (!collection) {
+            console.error("Collection imgur is not connected");
+            return false;
+        }
+        try {
+            await collection.findOneAndUpdate({}, {$set: credentials}, {upsert: true});
             return true;
         } catch (err) {
             console.error(err);
