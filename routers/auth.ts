@@ -2,7 +2,7 @@ import express from "express";
 import {OAuth2Client, UserRefreshClient} from "google-auth-library";
 import StatusCodes from "http-status-codes";
 
-import {createOAuthState} from "../managers/jwt";
+import {createOAuthState, verifyOAuthState} from "../managers/jwt";
 import passport from "passport";
 import {jwtAdmin} from "../managers/passport";
 
@@ -21,6 +21,21 @@ router.get(
         const username = (req.user as any).username as string;
         const {origin} = req.query as {origin?: string};
         res.json({state: createOAuthState(username, origin)});
+    }
+);
+
+// Verify the state for OAuth2.0.
+router.post(
+    '/state',
+    passport.authenticate(jwtAdmin, {session: false, failWithError: true}),
+    (req, res) => {
+        const {state} = req.body;
+        const username = (req.user as any).username as string;
+        const decoded = verifyOAuthState(state);
+        if (!decoded || decoded.username !== username) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({message: "Unauthorized"});
+        }
+        res.status(StatusCodes.OK).json({message: "Authorized"});
     }
 );
 
