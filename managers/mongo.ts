@@ -7,11 +7,11 @@ import {M3U8Mapping, SyncLog} from '../dto/ex/watch';
 
 dotenv.config();
 
-const collectionNotes = process.env.MONGO_COLLECTION_NOTES as string;
-const collectionVisitorLogs = process.env.MONGO_COLLECTION_VISITOR_LOGS as string;
-const collectionUsers = process.env.MONGO_COLLECTION_USERS as string;
-const collectionM3U8Mappings = process.env.MONGO_COLLECTION_M3U8_MAPPINGS as string;
-const collectionSyncLogs = process.env.MONGO_COLLECTION_SYNC_LOGS as string;
+const collectionNotes = "notes";
+const collectionVisitorLogs = "visitorLogs";
+const collectionUsers = "users";
+const collectionM3U8Mappings = "m3u8Mappings";
+const collectionSyncLogs = "syncLogs";
 
 class Manager {
     static async init(): Promise<null> {
@@ -21,9 +21,9 @@ class Manager {
         Manager.initStarted = true;
         Manager.collections = {};
         await Manager.client.connect();
-        const dbNotes = Manager.client.db(process.env.MONGO_DB_NOTES);
-        const dbUsers = Manager.client.db(process.env.MONGO_DB_USERS);
-        const dbWatch = Manager.client.db(process.env.MONGO_DB_WATCH);
+        const dbNotes = Manager.client.db("notes");
+        const dbUsers = Manager.client.db("users");
+        const dbWatch = Manager.client.db("watch");
         Manager.collections[collectionNotes] = dbNotes.collection(collectionNotes);
         Manager.collections[collectionVisitorLogs] = dbUsers.collection(collectionVisitorLogs);
         Manager.collections[collectionUsers] = dbUsers.collection(collectionUsers);
