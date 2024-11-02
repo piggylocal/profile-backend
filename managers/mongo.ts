@@ -285,6 +285,24 @@ class Manager {
         }
     }
 
+    static async getImgurCredentials(): Promise<ImgurCredentials | null> {
+        const collection = Manager.collections[collectionImgur];
+        if (!collection) {
+            console.error("Collection imgur is not connected");
+            return null;
+        }
+        try {
+            const result = await collection.findOne();
+            if (result === null) {
+                return null;
+            }
+            return result as unknown as ImgurCredentials;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+
     static async updateImgurCredentials(credentials: ImgurCredentials): Promise<boolean> {
         const collection = Manager.collections[collectionImgur];
         if (!collection) {
