@@ -5,6 +5,6 @@ export const createToken = (username: string): string => {
     return jwt.sign({username}, process.env.JWT_SECRET as string);
 };
 
-export const createOAuthState = (username: string): string => {
-    return jwt.sign({username, id: nanoid()}, process.env.JWT_SECRET as string);
+export const createOAuthState = (username: string, origin?: string): string => {
+    return jwt.sign({username, id: nanoid(), ...(origin && {origin})}, process.env.JWT_SECRET as string);
 }

@@ -19,7 +19,8 @@ router.get(
     passport.authenticate(jwtAdmin, {session: false, failWithError: true}),
     (req, res) => {
         const username = (req.user as any).username as string;
-        res.json({state: createOAuthState(username)});
+        const {origin} = req.query as {origin?: string};
+        res.json({state: createOAuthState(username, origin)});
     }
 );
 
